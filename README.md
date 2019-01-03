@@ -11,6 +11,9 @@
 ### CRIAR UM AMBINETE VIRTUAL
 `virtualenv nome_do_ambiente`
 
+### ATIVAR O AMBINETE VIRTUAL(pelo cmd, navegar para dentro do ambiente virtual criado e executar o comando a seguir)
+`Scripts\activate`
+
 ### CLONAR O PROJETO DENTRO DO AMBINETE VIRTUAL CRIADO (USAR O GIT BASH)
 `git clone https://github.com/TheQuito/projeto_agendas.git`
 
