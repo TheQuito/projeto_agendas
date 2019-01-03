@@ -10,6 +10,8 @@ from rest_framework import status
 
 import json
 import cx_Oracle
+from agendas_rest_api.utils.conexao import Conexao
+from agendas_rest_api.utils.querys import vagasAplicativo
 
 # Create your views here.
 def home(request):
@@ -25,9 +27,10 @@ def dashboard(request):
 def getVagasApp(request):
 	if request.is_ajax():
 		lista = []
-		con = cx_Oracle.connect('system/123456@localhost/XE')
+		#con = cx_Oracle.connect('system/123456@localhost/XE')
+		con = Conexao().obterConexao()
 		cursor = con.cursor()
-		cursor.execute('select * from vagas')
+		cursor.execute(vagasAplicativo)
 		for row in cursor:
 			lista.append(row)
 		contexto = {'vagas': lista}
@@ -37,6 +40,8 @@ def getVagasApp(request):
 	else:
 		contexto = {}
 		return redirect('agendas_rest_api:home')
+
+
 
 def getjson(request):
 	message = "Resposta atualizada com sucesso"
