@@ -9,6 +9,7 @@ class ConnectionData:
 		self.db = ''
 
 
+
 	def __del__(self):
 		del self
 
