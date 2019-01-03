@@ -1,0 +1,128 @@
+{% extends 'agendas_rest_api/_layouts/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block titulo_conteudo %}Dashboard{% endblock %}
+
+{% load static %}
+
+
+<body>
+	{% block conteudo %}
+	<div hidden="true">
+		{{ lista }}
+		<button id="btn" onclick="requestPage('http://localhost:9191/agendas_rest_api/gethtml/', '#conteudo')">Obter Html</button>
+		<button id="btn2">Obter Json</button>
+		<button id="btn3">Obter vagas</button>
+		<button id="btn4" onclick="requestPage('http://localhost:9191/agendas_rest_api/obterVagas', '#conteudo')">Obter vagas2</button>
+	</div>
+ 
+<br>
+	<div class="row m-b-1">
+		  <div class="col-lg-6">
+			  	<div class="card shadow">
+		        	<div id="chartContainer" style="height: 300px; width: 100%; border: 2px solid rgba(0,0,0, .2); box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5) "></div>
+		      </div>
+		  </div>
+		  <div class="col-lg-6">
+			  	<div class="card shadow">
+			        <div id="chartContainer2" style="height: 300px; width: 100%; border: 2px solid rgba(0,0,0, .2); box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5)"></div>
+			    </div>
+
+		  	<div id="crono" class="col-lg-2"></div>
+		  </div>
+	</div>
+
+	<script src="{% static 'agendas_rest_api/js/jquery-3.2.1.min.js' %}"></script>
+	<script src="{% static 'agendas_rest_api/js/requisicao.js' %}"></script>
+	<script src="{% static 'agendas_rest_api/js/vendors/canvasjs-2.2/canvasjs.min.js' %}"></script>
+
+	<script type="text/javascript">
+
+
+
+		// Instancia um gráfico e retorna o mesmo para quem chamou esta função
+		function loadChart(vagas, container, type='column'){
+			var chart = new CanvasJS.Chart(container, {
+				theme: "light1", // "light2", "dark1", "dark2"
+				animationEnabled: true, // change to true		
+				title:{
+					text: "Vagas por Especialidade"
+				},
+				data: [
+					{
+						innerRadius: "80%",
+						radius: "90%",
+						legendMarkerType: "square",
+						showInLegend: true,
+						startAngle: 90,
+						// Change type to "bar", "area", "spline", "pie",etc.
+						type: type,
+						dataPoints: vagas
+					}
+				]
+			})
+			return chart;
+		};
+		// Exibe um cronometro indicando o tempo restante para atualização do gráfico
+		tempo = 15;
+		setInterval(function(){
+			tempo --;
+			if(tempo == 0){
+				tempo = 15
+			}
+			$('#crono').html(tempo + ' segundos');
+		}, 1000);
+
+		// Atualiza os gráficos a cada 30 segundos
+		setInterval(function(){
+			$.get('http://localhost:9191/agendas_rest_api/getVagasApp/', function(data){
+				var i, listaVagas = [];
+				for (i = 0; i < data.vagas.length; i++) {
+					listaVagas[i] = {'name': data.vagas[i][1], 'label': data.vagas[i][1], 'y': data.vagas[i][3]};
+				};
+				loadChart(listaVagas, 'chartContainer').render();
+				loadChart(listaVagas, 'chartContainer2', 'pie').render();
+			}, 'json');
+		}, 15000);
+
+
+
+		window.onload = function (e){
+			$.get('http://localhost:9191/agendas_rest_api/getVagasApp/', function(data){
+				var i, listaVagas = [];
+				for (i = 0; i < data.vagas.length; i++) {
+					listaVagas[i] = {'name': data.vagas[i][1], 'label': data.vagas[i][1],  'y': data.vagas[i][3]};
+				};
+				loadChart(listaVagas, 'chartContainer').render();
+				loadChart(listaVagas, 'chartContainer2', 'doughnut').render();
+			}, 'json');
+
+		}
+
+		$('#btn2').on('click', function(e){
+			alert(e.clientX +' x '+ e.clientY)
+			$.get('http://localhost:9191/agendas_rest_api/getjson/', function(data){
+				if(data.success){
+					alert('tudo certo' + ' -' + data.message + ' - ' + data.valor)
+					$("#conteudo").html('Sucesso: ' + data.success);
+					$("#conteudo").append('<br>Mensagem: ' + data.message);
+					$("#conteudo").append('<br>Valor: ' + data.valor);
+				}else{
+					alert(data.message);
+				}
+			}, 'json')
+		});
+
+		$('#btn3').on('click', function(e){
+			$.get('http://localhost:9191/agendas_rest_api/obterVagas', function(data){
+				alert(data.vagas[2].estabelecimento + ' - ' + data.vagas[2].vagas)
+				$("#conteudo").append(data.vagas[2].estabelecimento + ' - ' + data.vagas[2].vagas);
+			}, 'json')
+		});
+		
+	</script>
+	{% endblock %}
+</body>
+
+</html>

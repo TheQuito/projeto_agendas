@@ -1,0 +1,90 @@
+{% extends 'agendas_rest_api/_layouts/base2.html' %}
+{% load static %}
+
+
+<!-- head -->
+	{% block title %}Web Analytics - Real Time{% endblock %}
+	{% block styles %}{% endblock %}
+
+
+			{% block conteudo%}
+				<!-- 1st row -->
+				<div class="row m-b-2">
+					<div class="col-lg-4">
+						<div class="card card-block">
+							<h4 class="card-title">Atraso médio por clínica</h4>
+							<div id="users-device-doughnut-chart" style="height: 350px"></div>
+						</div>
+					</div>
+					
+					<div class="col-lg-4">
+						<div class="card card-block">
+							<h4 class="card-title">Vagas por Especilaidade</h4>
+							<div id="chartContainer" style="height: 350px"></div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="card card-block">
+							<h4 class="card-title">Taxa de falta Especilaidade</h4>
+							<div id="chartContainer2" style="height: 350px"></div>
+						</div>
+					</div>
+					<div class="col-lg-4" hidden="true">
+						<div class="card card-block">
+							<h4 class="card-title">Medium</h4>
+							<div id="users-medium-pie-chart"></div>
+						</div>
+					</div>
+				</div>
+				<!-- /1st row -->
+
+
+				<!-- 2rd row -->
+				<div class="row">
+					<div class="col-md-12">
+						<div class="card card-block">
+							<h4 class="card-title">Location</h4>
+							<div id="users-state-bar-chart"></div>
+						</div>
+					</div>
+				</div>
+				<!-- /2rd row -->
+				<div id="users-category-pie-chart" hidden="true"></div>
+			{% endblock %}
+
+
+			<!--BLOCO DE SCRIPTS-->
+			{% block page_scripts %}
+				<script src="{% static 'agendas_rest_api/js/jquery-3.2.1.min.js' %}"></script>
+				<script src="{% static 'agendas_rest_api/js/requisicao.js' %}"></script>
+				<script src="{% static 'agendas_rest_api/js/my_charts.js' %}"></script>
+				
+				<script type="text/javascript">
+
+					/* Executa uma requisição ajax na api restFul em busca dos dados de vagas para o aplicativo.
+					   Na sequência executa as funções barChart() e pieChart() passando os dados obtidos
+					   na requisição ajax, e o id do container onde o gráfico deve ser plotado	
+					*/
+					function loadChart(){
+						$.get('http://localhost:9191/agendas_rest_api/getVagasApp/', function(data){
+							i, listaVagas = [];
+							for (i = 0; i < data.vagas.length; i++) {
+								listaVagas[i] = {'name': data.vagas[i][1], 'label': data.vagas[i][1],  'y': data.vagas[i][3]};
+							};
+							barChart(listaVagas, 'chartContainer').render();
+							pieChart(listaVagas, 'chartContainer2').render();
+						}, 'json');
+					};
+
+
+					/*Executa a função loadChart() a cada 15 segundos*/
+					setInterval(function(){
+						loadChart();
+					}, 5000);
+
+					
+					/*Executa a função loadChart() no carregamento da página*/
+					window.onload = loadChart();
+				</script>	
+			{% endblock %}
+			<!--/BLOCO DE SCRIPTS-->
