@@ -1,0 +1,101 @@
+{% extends 'agendas_rest_api/_layouts/base3.html' %}
+{% load static %}
+
+
+<!-- head -->
+{% block title %}América Analytics - Real Time{% endblock %}
+
+
+{% block page_styles %}
+<style type="text/css">
+	.chartDetails {
+		box-shadow: -1px 2px 8px rgba(0, 0, 0, 0.3);
+		padding: 0%;
+	}
+
+	.card-content {
+		font-size: 14pt;
+		box-shadow: -1px 2px 8px rgba(0, 0, 0, 0.3);
+		padding: 5%;
+	}
+
+	.header-card {
+		font-size: 16pt;
+		font-weight: bolder;
+		box-shadow: -1px 2px 8px rgba(0, 0, 0, 0.3);
+		padding: 5%;
+		background-color: #ccc;
+	}
+</style>
+
+{% endblock %}
+
+
+{% block conteudo%}
+<!-- 1st row -->
+<div class="row m-b-2">
+
+	<div class="col-lg-9">
+		<div class="card card-block">
+			<h4 class="card-title">Vagas do aplicativo</h4>
+			<canvas id="chartContainer"></canvas>
+		</div>
+	</div>
+
+	<div class="col-lg-3">
+
+		<div class="card card-block">
+			<div class="chartDetails">
+				<div class="header-card">
+					Dados
+				</div>
+				<div class="card-content">
+					<p><strong>Dermatologia: </strong> As vagas para dermatologia estão distribuídas nos próximos 10 dias.</p>
+					<p><strong>Pediatria: </strong> As vagas para pediatria estão distribuídas no período de 6 dias a partir de hoje.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<!-- /1st row -->
+{% endblock %}
+
+
+<!--BLOCO DE SCRIPTS-->
+{% block page_scripts %}
+
+<script src="{% static 'agendas_rest_api/js/myChart.js' %}"></script>
+
+
+
+<script type="text/javascript">
+
+	/* Executa uma requisição ajax na api restFul em busca dos dados de vagas para o aplicativo.
+	   Na sequência executa as funções barChart() e pieChart() passando os dados obtidos
+	   na requisição ajax, e o id do container onde o gráfico deve ser plotado	
+	*/
+	function loadChart() {
+		$.get('http://localhost:9191/agendas_rest_api/getVagasApp/', function (data) {
+			var labels = [];
+			var dados = [];
+			for (var i = 0; i < data.vagas.length; i++) {
+				labels[i] = data.vagas[i][0];
+				dados[i] = data.vagas[i][1];
+			};
+			var ctx = document.getElementById('chartContainer').getContext('2d');
+			chartBar(ctx, labels, dados);
+		}, 'json');
+	};
+
+	/*Executa a função loadChart() a cada 15 segundos*/
+	setInterval(function () {
+		loadChart();
+	}, 15000);
+
+
+	/*Executa a função loadChart() no carregamento da página*/
+	window.onload = loadChart();
+</script>
+{% endblock %}
+<!--/BLOCO DE SCRIPTS-->

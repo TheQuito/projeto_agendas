@@ -1,4 +1,6 @@
+/agendas_rest_api/utils/connectionData.py
 /.project
 /.pydevproject
 /db.sqlite3
-/agendas_rest_api/utils/connectionData.py
+/.vs/
+/agendas_rest_api/utils/__pycache__/
