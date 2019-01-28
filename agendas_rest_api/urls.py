@@ -12,5 +12,6 @@ app_name='agendas_rest_api'
 urlpatterns = [
 	#path('router', include(router.urls)),
 	path('', views.dashboard, name='dashboard'),
-	path('getVagasApp/', views.getVagasApp, name='getVagasApp'),	
+	path('getVagasApp/', views.getVagasApp, name='getVagasApp'),
+	path('agendamentosApp/', views.agendamentosApp, name='agendamentosApp'),	
 ]
