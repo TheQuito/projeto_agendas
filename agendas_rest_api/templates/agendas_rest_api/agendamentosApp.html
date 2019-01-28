@@ -1,0 +1,165 @@
+{% extends 'agendas_rest_api/_layouts/base3.html' %}
+{% load static %}
+
+
+<!-- head -->
+{% block title %}América Analytics - Real Time{% endblock %}
+
+
+{% block page_styles %}{% endblock %}
+
+
+{% block conteudo%}
+<!-- 1st row -->
+<div class="container"> <!--class="row m-b-5"-->
+	<div class="col-lg-12">
+		<h6>Agendamentos  do App</h6>
+		<div class="card card-block">
+			<div ><a id="menu-modal" href="#" onclick="$('#myModal-sm').modal()"><i class="fas fa-bars"> Filtros</i> </a></div>
+			<div class="col-lg-12">
+				<canvas id="myChart"  onmouseover="this.style.cursor = 'context-menu';" onmouseout="this.style.transform='scale(1)'"></canvas>
+				<!--this.style.transform='scale(1.003)'-->
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div id="myModal-sm" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Filtros</h4>
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+			<div class="modal-body">
+				<form id="form-filtro">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="form-group">
+								<label for="exampleFormControlFile1">Estabelecimento</label>
+								<select name="estabelecimento" id="estabelecimento" class="form-control form-control-sm">
+								<option>Todos</option>
+								<option>Hospital Jardim América</option>
+								<option>Clinica de especialidades</option>
+								<option>Hospital América</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label for="exampleFormControlFile1">Início</label>
+								<input type="date" name="dataInicio" id="dataInicio" class="form-control">
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="form-group">
+								<label for="exampleFormControlFile1">Fim</label>
+								<input type="date" name="dataFim" id="dataFim" class="form-control">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" id="atualizar-grafico" class="btn btn-default" data-dismiss="modal">Atualizar Gráfico</button>
+					</div>
+				</form>
+			</div>
+			
+		
+		</div>
+	</div>
+</div>
+<!-- /1st row -->
+{% endblock %}
+
+
+<!--BLOCO DE SCRIPTS-->
+{% block page_scripts %}
+
+<script src="{% static 'agendas_rest_api/js/myChart.js' %}"></script>
+
+<script type="text/javascript">
+		
+	// FUNÇÃO QUE PREPARA OS DADOS E EM SEGUIDA CHAMA A FUNÇÃO QUE CARREGA O GRÁFICO
+	function loadData(myChart, estabelecimento, dataInicio, dataFim){
+			var labels = [];
+			var estabelecimento = estabelecimento;
+			
+			var dataInicio = dataInicio;
+			var dataFim = dataFim;
+			var url = 'http://localhost:9191/agendas_rest_api/agendamentosApp'
+			var parametros = '?estabelecimento='+estabelecimento+'&dataInicio='+dataInicio+'&dataFim='+dataFim
+			
+			$.get(url + parametros, function (dados) {		
+				for(var i = 0; i < dados.listaDeDatas.length; i++){
+					labels[i] = dados.listaDeDatas[i];
+					
+				}
+
+				var datasets = []
+				for(var i = 0; i < dados.agendamentos.length; i++){
+					qtds = [];
+
+					for(var j=0, k=0; j < labels.length; j++){
+						if(k < dados.agendamentos[i].length){
+							if(labels[j] == dados.agendamentos[i][k].data){
+								//console.log(dados.agendamentos[i][k].especialidade +' - '+ labels[j] + ' - ' + dados.agendamentos[i][k].data+ ' - ' + dados.agendamentos[i][k].qtd)
+								qtds[j] =  dados.agendamentos[i][k].qtd;
+								k++
+							}else{
+								qtds[j] = 0;
+							}
+						}else{
+							qtds[j] = 0;
+						}					
+					}
+
+					datasets[i] = {
+						label : dados.agendamentos[i][i].especialidade,
+						borderColor: cores[i],
+						backgroundColor : 'rgba(0,0,0,0)',
+						data : qtds,
+					};
+				}
+	
+				loadChart(myChart, labels, datasets);
+			}, 'json');
+
+		}
+
+	// ADICIONANDO MANIPULADORES DE EVENTO
+	document.getElementById('myChart').onmousedown = detectRightButton;
+	window.onload = loadData('myChart');
+
+
+
+	document.getElementById('atualizar-grafico').addEventListener('click', function(e){
+		e.preventDefault();
+		var estabelecimento = $('#estabelecimento').val();
+		//var especialidade = $('#especialidade').val();
+		var dataInicio = $('#dataInicio').val();
+		var dataFim = $('#dataFim').val();
+
+		loadData('myChart', estabelecimento, dataInicio, dataFim);
+	})
+		
+
+	// FUNÇÃO QUE GERA UMA INSTÂNCIA DE CHART PASSANDO O ID DO CONTAINER, ARRAY DE LABELS E ARRAY DE DATASETS
+	function loadChart(myChart, labels, datasets){
+		var ctx = document.getElementById(myChart).getContext('2d');
+		chartLine(ctx, labels, datasets);
+	}
+
+	function detectRightButton(event){
+		button = event.which;
+		if(button == 3){
+			document.body.oncontextmenu = function() {return false;};  //desabilita o menu de contexto do botão direito
+			$("#myModal-sm").modal();
+		}
+	}
+		
+</script>
+{% endblock %}
+<!--/BLOCO DE SCRIPTS-->
