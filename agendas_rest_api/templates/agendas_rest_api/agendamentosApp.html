@@ -11,6 +11,7 @@
 
 {% block conteudo%}
 <!-- 1st row -->
+<!-- Botão para abrir um modal com campos do filtro -->
 <div class="container"> <!--class="row m-b-5"-->
 	<div class="col-lg-12">
 		<h6>Agendamentos  do App</h6>
@@ -105,7 +106,6 @@
 					for(var j=0, k=0; j < labels.length; j++){
 						if(k < dados.agendamentos[i].length){
 							if(labels[j] == dados.agendamentos[i][k].data){
-								//console.log(dados.agendamentos[i][k].especialidade +' - '+ labels[j] + ' - ' + dados.agendamentos[i][k].data+ ' - ' + dados.agendamentos[i][k].qtd)
 								qtds[j] =  dados.agendamentos[i][k].qtd;
 								k++
 							}else{
@@ -152,6 +152,7 @@
 		chartLine(ctx, labels, datasets);
 	}
 
+	// CAPTURA O EVENTO DE CLICK DO BOTÃO DIREITO DO MOUSE SOBRE O GRÁFICO E ABRE UM MODAL COM CAMPOS PARA ESPECIFICAR FILTROS
 	function detectRightButton(event){
 		button = event.which;
 		if(button == 3){
