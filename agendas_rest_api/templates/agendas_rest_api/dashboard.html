@@ -25,7 +25,7 @@
 	</div>
 	<div class="col-lg-4">
 		<div class="card card-block">
-			<h5 class="card-title">Vagas do aplicativo</h5>
+			<h5 class="card-title">Agendamentos no aplicativo</h5>
 			<canvas id="chartContainer2" height="250"></canvas>
 		</div>
 	</div>
@@ -39,46 +39,25 @@
 		</div>
 	</div>
 
-
 </div>
 {% endblock %}
 <!-- /conteúdo -->
 
 
-
 <!--scripts-->
 {% block page_scripts %}
 <script src="{% static 'agendas_rest_api/js/myChart.js' %}"></script>
+<script src="{% static 'agendas_rest_api/js/dashboard.js' %}"></script>
 
 <script type="text/javascript">
-
-	/* Executa uma requisição ajax na api restFul em busca dos dados de vagas para o aplicativo.
-	   Na sequência executa as funções barChart() e pieChart() passando os dados obtidos
-	   na requisição ajax, e o id do container onde o gráfico deve ser plotado	
-	*/
-	function loadChart() {
-		$.get('http://localhost:9191/agendas_rest_api/getVagasApp/', function (data) {	
-			var labels = [];
-			var dados = [];
-			for (var i = 0; i < data.vagas.length; i++) {
-				labels[i] = data.vagas[i][0];
-				dados[i] = data.vagas[i][1];
-			};
-			var ctx1 = document.getElementById('chartContainer0').getContext('2d');
-			var ctx2 = document.getElementById('chartContainer1').getContext('2d');
-			chartBar(ctx1, labels, dados);
-			chartPie(ctx2, labels, dados);
-		}, 'json');
-	};
-
 	/*Executa a função loadChart() a cada 15 segundos*/
 	setInterval(function () {
 		loadChart();
+		loadDataAgendamentosApp('chartContainer2');
 	}, 15000);
 
-
 	/*Executa a função loadChart() no carregamento da página*/
-	window.onload = loadChart();
+	window.onload = loadChart(), loadDataAgendamentosApp('chartContainer2');
 </script>
 {% endblock %}
 <!--/scripts-->
