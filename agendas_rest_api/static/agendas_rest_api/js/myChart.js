@@ -1,5 +1,6 @@
 
 var cores = [
+    'rgb(0, 99, 132)', 'rgb(255, 99, 132)', 'rgb(255, 99, 0)',
     '#1232B', '#B5C334', '#FCCE10', '#E87C25', '#27727B', '#FE8463', '#9BCA63', '#FAD860', '#F3A43B', '#60C0DD', '#D7504B', '#C6E579', '#F4E001',
     '#F0805A', '#26C0C0',
     'rgba(255,201,47,0.8)', 'rgba(117,121,146,0.8)', 'rgba(255,202,149,0.8)', 'rgba(85,261,39,0.8)', 'rgba(255,621,50,0.8)', 'rgba(255,0,0,0.8)',
@@ -114,12 +115,17 @@ function charthorizontalBar(ctx, labels, data) {
         },
 
         options: {
-            scales: {
-                yAxes: [{
+            scales: {   
+                xAxes: [{
                     ticks: {
                         beginAtZero: true,
                     },
-                }]
+                }],
+
+                yAxes: [{
+                    categoryPercentage: 0.7,
+                    barPercentage: 0.7,
+                }],
             },
             layout: {
                 padding: {
@@ -132,3 +138,40 @@ function charthorizontalBar(ctx, labels, data) {
         }
     });
 }
+
+
+
+function chartLine(ctx, labels, datasets) {
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data:{
+            labels: labels,
+            datasets: datasets,  
+        },
+
+        options: {
+            scales: {   
+                xAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                }],
+
+                yAxes: [{
+                    categoryPercentage: 0.7,
+                    barPercentage: 0.7,
+                }],
+            },
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 10,
+                    top: 10,
+                    botton: 10
+                }
+            }
+        }
+    });
+}
+
+
