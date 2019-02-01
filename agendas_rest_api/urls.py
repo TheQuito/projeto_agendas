@@ -1,10 +1,9 @@
+from django.contrib import admin
 from django.urls import path, include
 from . import views
 
-from rest_framework import routers
-#from classifier.views import ClasseViewSet
-
-router = routers.DefaultRouter()
+#from rest_framework import routers
+#router = routers.DefaultRouter()
 
 
 app_name='agendas_rest_api'
@@ -13,5 +12,8 @@ urlpatterns = [
 	#path('router', include(router.urls)),
 	path('', views.dashboard, name='dashboard'),
 	path('getVagasApp/', views.getVagasApp, name='getVagasApp'),
-	path('agendamentosApp/', views.agendamentosApp, name='agendamentosApp'),	
+	path('agendamentosApp/', views.agendamentosApp, name='agendamentosApp'),
+	
+	path('login/', views.login, name='login'),
+	path('sair/', views.sair, name='sair'),
 ]
