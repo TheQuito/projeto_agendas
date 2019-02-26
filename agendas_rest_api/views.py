@@ -22,6 +22,7 @@ from agendas_rest_api.utils.conexao import Conexao
 from agendas_rest_api.utils.querys import getQueryVagasApp
 from agendas_rest_api.utils.datasUtil import obterListaDeDatas, getDia, getMes, getAno, getData
 from agendas_rest_api.services.vagasApp import AgendamentosApp
+from agendas_rest_api.services.exames import Exames
 
 
 
@@ -55,18 +56,19 @@ def dashboard(request):
 
 
 def getVagasApp(request):
-	if request.is_ajax():
-		lista = AgendamentosApp().obterVagasDisponiveis()
-		contexto = {'vagas': lista}
-		return HttpResponse(json.dumps(contexto), content_type='application/json')
-	else:
-		contexto = {}
-		return render(request, 'agendas_rest_api/vagasApp.html', {})
-
+	if (request.user.has_perm('global_permissions.view_getVagasApp')):
+		if request.is_ajax():
+			lista = AgendamentosApp().obterVagasDisponiveis()
+			contexto = {'vagas': lista}
+			return HttpResponse(json.dumps(contexto), content_type='application/json')
+		else:
+			contexto = {}
+			return render(request, 'agendas_rest_api/vagasApp.html', {})
+	
 
 @login_required
 def agendamentosApp(request):
-	if request.user.has_perm('global_permissions.acessar_agendamentosApp'):
+	if request.user.has_perm('global_permissions.view_agendamentosApp'):
 		if request.is_ajax():
 			dataInicio = request.GET.get('dataInicio')
 			dataFim = request.GET.get('dataFim')
@@ -95,7 +97,12 @@ def agendamentosApp(request):
 		return redirect('agendas_rest_api:dashboard')
 
 
-
-
-
-
+def atrasoMedioExames(request):
+	exames = Exames()
+	listaExames = exames.tempoEsperaPorExame()
+	if request.is_ajax():
+		contexto = {'listaExames':listaExames}
+		return HttpResponse(json.dumps(contexto), content_type='application/json')
+	else:
+		contexto = {'listaExames':listaExames}
+		return HttpResponse(json.dumps(contexto), content_type='application/json')

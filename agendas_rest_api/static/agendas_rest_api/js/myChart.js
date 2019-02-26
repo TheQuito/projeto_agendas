@@ -52,8 +52,8 @@ function chartBar(ctx, labels, data) {
                     botton: 10
                 }
             },
-            legend:{
-                display: true, 
+            legend: {
+                display: true,
             }
         }
     });
@@ -115,7 +115,7 @@ function charthorizontalBar(ctx, labels, data) {
         },
 
         options: {
-            scales: {   
+            scales: {
                 xAxes: [{
                     ticks: {
                         beginAtZero: true,
@@ -144,13 +144,13 @@ function charthorizontalBar(ctx, labels, data) {
 function chartLine(ctx, labels, datasets) {
     var chart = new Chart(ctx, {
         type: 'line',
-        data:{
+        data: {
             labels: labels,
-            datasets: datasets,  
+            datasets: datasets,
         },
 
         options: {
-            scales: {   
+            scales: {
                 xAxes: [{
                     ticks: {
                         beginAtZero: true,

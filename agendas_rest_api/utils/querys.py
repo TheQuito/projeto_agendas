@@ -1,12 +1,119 @@
 
 # TOTAL DE VAGAS APLICATIVO
+def getQueryVagasApp():
+    queryVagasApp = 'WITH total_dermato AS ( SELECT '
+    queryVagasApp = queryVagasApp + "C.NM_FANTASIA_ESTAB AS ESTABELECIMENTO, "
+    queryVagasApp = queryVagasApp + "OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N') AS PROFISSIONAL, "
+    queryVagasApp = queryVagasApp + "OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) AS ESPECIALIDADE, "
+    queryVagasApp = queryVagasApp + "COUNT(A.IE_STATUS_AGENDA) AS QUANTIDADE_DE_VAGAS "
+    queryVagasApp = queryVagasApp + "from AGENDA_CONSULTA A "
+    queryVagasApp = queryVagasApp + "INNER JOIN AGENDA B ON (A.CD_AGENDA = B.CD_AGENDA) "
+    queryVagasApp = queryVagasApp + "INNER JOIN ESTABELECIMENTO C ON (B.CD_ESTABELECIMENTO = C.CD_ESTABELECIMENTO) "
+    queryVagasApp = queryVagasApp + "INNER JOIN AGENDA_TURNO D ON (B.CD_AGENDA = D.CD_AGENDA AND A.NR_SEQ_TURNO = D.NR_SEQUENCIA) "
+    queryVagasApp = queryVagasApp + "WHERE "
+    queryVagasApp = queryVagasApp + "A.IE_STATUS_AGENDA = 'L' "
+    queryVagasApp = queryVagasApp + "AND B.CD_ESPECIALIDADE IN(49) "                              # A CONSULTA FOI ALTERADA AQUI. FORMA ADICIONADOS NOVOS CÓDIGOS DE ESPECIALIDADE
+    queryVagasApp = queryVagasApp + "AND C.CD_ESTABELECIMENTO <> '22' "
+    queryVagasApp = queryVagasApp + "AND A.DT_AGENDA BETWEEN SYSDATE AND (SYSDATE+10) "
+    queryVagasApp = queryVagasApp + "AND D.DS_OBS_INTERNA LIKE '%@CST@%' "
+    queryVagasApp = queryVagasApp + "GROUP BY C.NM_FANTASIA_ESTAB, OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N'), OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) "
+    queryVagasApp = queryVagasApp + "ORDER BY COUNT(A.IE_STATUS_AGENDA) DESC, C.NM_FANTASIA_ESTAB, OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N'), OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) "
+    queryVagasApp = queryVagasApp + "), "
+    queryVagasApp = queryVagasApp + "total_ped AS ( "
+    queryVagasApp = queryVagasApp + "select "
+    queryVagasApp = queryVagasApp + "C.NM_FANTASIA_ESTAB AS ESTABELECIMENTO, "
+    queryVagasApp = queryVagasApp + "OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N') AS PROFISSIONAL, "
+    queryVagasApp = queryVagasApp + "OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) AS ESPECIALIDADE, "
+    queryVagasApp = queryVagasApp + "COUNT(A.IE_STATUS_AGENDA) AS QUANTIDADE_DE_VAGAS "
+    queryVagasApp = queryVagasApp + "from AGENDA_CONSULTA A "
+    queryVagasApp = queryVagasApp + "INNER JOIN AGENDA B ON (A.CD_AGENDA = B.CD_AGENDA) " 
+    queryVagasApp = queryVagasApp + "INNER JOIN ESTABELECIMENTO C ON (B.CD_ESTABELECIMENTO = C.CD_ESTABELECIMENTO) "
+    queryVagasApp = queryVagasApp + "INNER JOIN AGENDA_TURNO D ON (B.CD_AGENDA = D.CD_AGENDA AND A.NR_SEQ_TURNO = D.NR_SEQUENCIA) "
+    queryVagasApp = queryVagasApp + "WHERE A.IE_STATUS_AGENDA = 'L' " 
+    queryVagasApp = queryVagasApp + "AND B.CD_ESPECIALIDADE IN(3) "
+    queryVagasApp = queryVagasApp + "AND C.CD_ESTABELECIMENTO <> '22' " 
+    queryVagasApp = queryVagasApp + "AND A.DT_AGENDA BETWEEN SYSDATE AND (SYSDATE+6) "
+    queryVagasApp = queryVagasApp + "AND D.DS_OBS_INTERNA LIKE '%@CST@%' "
+    queryVagasApp = queryVagasApp + "GROUP BY C.NM_FANTASIA_ESTAB, OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N'), OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) " 
+    queryVagasApp = queryVagasApp + "ORDER BY COUNT(A.IE_STATUS_AGENDA) DESC, C.NM_FANTASIA_ESTAB, OBTER_NOME_MEDICO(B.CD_PESSOA_FISICA,'N'), OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) )" 
+    queryVagasApp = queryVagasApp + "SELECT * FROM ("
+    queryVagasApp = queryVagasApp + "SELECT ESPECIALIDADE, SUM(QUANTIDADE_DE_VAGAS) AS QTD FROM total_dermato GROUP BY ESPECIALIDADE " 
+    queryVagasApp = queryVagasApp + "UNION SELECT ESPECIALIDADE, SUM(QUANTIDADE_DE_VAGAS) AS QTD FROM total_ped GROUP BY ESPECIALIDADE " 
+    queryVagasApp = queryVagasApp + ")ORDER BY QTD"
+    return queryVagasApp
 
 
 
 
-        
-        
-        
+
+def getQueryAgendamentosRealizados(especialidade, dataInicio, dataFim):
+    agendamentosApp = "select "
+    agendamentosApp = agendamentosApp + "OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE) AS ESPECIALIDADE, "
+    agendamentosApp = agendamentosApp + "to_char(A.DT_AGENDA, 'dd/mm/yyyy'), "
+    agendamentosApp = agendamentosApp + "COUNT(A.IE_STATUS_AGENDA) AS QUANTIDADE_DE_VAGAS "
+    agendamentosApp = agendamentosApp + "from AGENDA_CONSULTA A "
+    agendamentosApp = agendamentosApp + "INNER JOIN AGENDA B ON (A.CD_AGENDA = B.CD_AGENDA) "
+    agendamentosApp = agendamentosApp + "INNER JOIN ESTABELECIMENTO C ON (B.CD_ESTABELECIMENTO = C.CD_ESTABELECIMENTO) "
+    agendamentosApp = agendamentosApp + "INNER JOIN AGENDA_TURNO D ON (B.CD_AGENDA = D.CD_AGENDA AND A.NR_SEQ_TURNO = D.NR_SEQUENCIA) "
+    #agendamentosApp = agendamentosApp + "AND D.DS_OBS_INTERNA LIKE '%@CST@%' "
+    agendamentosApp = agendamentosApp + "AND A.NM_USUARIO_ORIGEM = 'wsamerica' "
+    agendamentosApp = agendamentosApp + " AND B.CD_ESPECIALIDADE IN('"+ especialidade +"') "
+    agendamentosApp = agendamentosApp + "AND C.CD_ESTABELECIMENTO <> '22' "
+    agendamentosApp = agendamentosApp + "AND A.DT_AGENDA BETWEEN to_date('" + dataInicio + "','dd/mm/yyyy') AND to_date('" + dataFim + "','dd/mm/yyyy') "
+    agendamentosApp = agendamentosApp + "AND B.IE_SITUACAO = 'A' "
+    agendamentosApp = agendamentosApp + "GROUP BY OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE), to_char(A.DT_AGENDA, 'dd/mm/yyyy') "
+    agendamentosApp = agendamentosApp + "order by OBTER_DESC_ESPEC_MEDICA(B.CD_ESPECIALIDADE), to_char(A.DT_AGENDA, 'dd/mm/yyyy')"
+    return agendamentosApp
+
+
+
+def getTempoEsperaPorExame():
+    tempoEspera = "WITH FAKEVIEW AS "
+    tempoEspera = tempoEspera + "( "
+    tempoEspera = tempoEspera + "   SELECT "
+    tempoEspera = tempoEspera + "       C.NM_FANTASIA_ESTAB ESTABELECIMENTO, "
+    tempoEspera = tempoEspera + "       OBTER_DESC_CLASSIF_AGENDA_PAC(A.NR_SEQ_CLASSIF_AGENDA) EXAME, "
+    tempoEspera = tempoEspera + "       A.HR_INICIO DATA_MARCADA, "
+    tempoEspera = tempoEspera + "       TO_CHAR(A.HR_INICIO, 'HH24:MI') HORA_MARCADA_TASY, "
+    tempoEspera = tempoEspera + "   CASE "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '00' AND '19' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '00') "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '20' AND '39' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '20') "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '40' AND '59' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '40') "
+    tempoEspera = tempoEspera + "   END AS HORA_INFORMADA_PACIENTE, "
+    tempoEspera = tempoEspera + "   TO_CHAR(A.DT_ATENDIMENTO, 'HH24:MI') HORA_ATENDIMENTO, "
+    tempoEspera = tempoEspera + "   CASE "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '00' AND '19' THEN ROUND(avg(A.dt_atendimento - to_date(to_char(A.HR_INICIO - to_number(to_char(A.HR_INICIO, 'mi'))/(24*60),'dd/mm/yyyy hh24:mi:ss'), 'dd/mm/yyyy hh24:mi:ss'))*24*60, 0) "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '20' AND '39' THEN ROUND(avg(A.dt_atendimento - to_date(to_char(A.HR_INICIO - to_number(to_char(A.HR_INICIO, 'mi'))/(24*60) + 20/(24*60),'dd/mm/yyyy hh24:mi:ss'), 'dd/mm/yyyy hh24:mi:ss'))*24*60, 0) "
+    tempoEspera = tempoEspera + "       WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '40' AND '59' THEN ROUND(avg(A.dt_atendimento - to_date(to_char(A.HR_INICIO - to_number(to_char(A.HR_INICIO, 'mi'))/(24*60) + 40/(24*60),'dd/mm/yyyy hh24:mi:ss'), 'dd/mm/yyyy hh24:mi:ss'))*24*60, 0) "
+    tempoEspera = tempoEspera + "   END ATRASO_REAL "
+    tempoEspera = tempoEspera + "   FROM AGENDA_PACIENTE A  "
+    tempoEspera = tempoEspera + "       INNER JOIN AGENDA B ON (A.CD_AGENDA = B.CD_AGENDA) "
+    tempoEspera = tempoEspera + "       INNER JOIN ESTABELECIMENTO C ON(B.CD_ESTABELECIMENTO = C.CD_ESTABELECIMENTO) "
+    tempoEspera = tempoEspera + "   WHERE "
+    tempoEspera = tempoEspera + "       TO_CHAR(A.HR_INICIO, 'dd/mm/yyyy') between  '02/01/2019' and '02/02/2019' "
+    tempoEspera = tempoEspera + "       AND A.CD_AGENDA IN(442, 451, 611, 612, 615, 661) "
+    tempoEspera = tempoEspera + "       AND A.IE_STATUS_AGENDA NOT IN('C') "
+    tempoEspera = tempoEspera + "       AND A.DT_ATENDIMENTO IS NOT NULL "
+    tempoEspera = tempoEspera + "   GROUP BY "
+    tempoEspera = tempoEspera + "       C.NM_FANTASIA_ESTAB, "
+    tempoEspera = tempoEspera + "       OBTER_EXAME_AGENDA(A.CD_PROCEDIMENTO, "
+    tempoEspera = tempoEspera + "       A.IE_ORIGEM_PROCED, "
+    tempoEspera = tempoEspera + "       NR_SEQ_PROC_INTERNO), "
+    tempoEspera = tempoEspera + "       OBTER_DESC_CLASSIF_AGENDA_PAC(A.NR_SEQ_CLASSIF_AGENDA), A.HR_INICIO, "
+    tempoEspera = tempoEspera + "       TO_CHAR(A.HR_INICIO, 'HH24:MI'), "
+    tempoEspera = tempoEspera + "       CASE "
+    tempoEspera = tempoEspera + "           WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '00' AND '19' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '00') "
+    tempoEspera = tempoEspera + "           WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '20' AND '39' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '20') "
+    tempoEspera = tempoEspera + "           WHEN TO_CHAR(A.HR_INICIO, 'MI') BETWEEN '40' AND '59' THEN CONCAT(TO_CHAR(A.HR_INICIO, 'HH24:'), '40') "
+    tempoEspera = tempoEspera + "       END, "
+    tempoEspera = tempoEspera + "       TO_CHAR(A.DT_ATENDIMENTO, 'HH24:MI') "
+    tempoEspera = tempoEspera + "   ORDER BY A.HR_INICIO, TO_CHAR(A.HR_INICIO, 'HH24:MI') "
+    tempoEspera = tempoEspera + ") "
+    tempoEspera = tempoEspera + "SELECT EXAME, ROUND(AVG(ATRASO_REAL)) ATRASO_REAL FROM FAKEVIEW "
+    tempoEspera = tempoEspera + "WHERE ATRASO_REAL BETWEEN -100 AND 100 "
+    tempoEspera = tempoEspera + "and EXAME IS NOT NULL "
+    tempoEspera = tempoEspera + "AND EXAME != 'Encaixe' GROUP BY EXAME "
+    return tempoEspera  
         
         
         
